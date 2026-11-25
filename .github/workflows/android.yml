@@ -1,3 +1,4 @@
+
 name: FFMicPlayer APK Builder
 
 on:
@@ -29,6 +30,11 @@ jobs:
         with:
           gradle-version: '7.5'
 
+      - name: Extract Android Project
+        run: |
+          unzip -o FFMicPlayer.zip -d .
+          ls -la
+
       - name: Build APK
         run: gradle --no-daemon assembleDebug
 
@@ -38,3 +44,4 @@ jobs:
           name: FFMicPlayer-APK
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          retention-days: 14
