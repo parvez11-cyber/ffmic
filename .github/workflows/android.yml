@@ -1,56 +1,44 @@
+Build
+ · YML
 name: FFMicPlayer APK Builder
-
+ 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
       - master
-
+ 
 permissions:
   contents: read
-
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+ 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
+ 
       - name: Setup Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
+ 
       - name: Extract Project
         run: |
           unzip -o FFMicPlayer.zip -d .
           ls -la
-
-      - name: Fix Missing App Icons
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          p = Path("app/src/main/AndroidManifest.xml")
-          s = p.read_text()
-          s = re.sub(r'\s+android:icon="[^"]*"', '', s)
-          s = re.sub(r'\s+android:roundIcon="[^"]*"', '', s)
-          p.write_text(s)
-          print("Missing icon references removed.")
-          PY
-
+ 
       - name: Build APK
         run: gradle --no-daemon assembleDebug
-
+ 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
@@ -58,3 +46,5 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
+ 
+Claude finished the response
