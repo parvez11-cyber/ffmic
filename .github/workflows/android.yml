@@ -1,4 +1,3 @@
-
 name: FFMicPlayer APK Builder
 
 on:
@@ -30,10 +29,24 @@ jobs:
         with:
           gradle-version: '7.5'
 
-      - name: Extract Android Project
+      - name: Extract Project
         run: |
           unzip -o FFMicPlayer.zip -d .
           ls -la
+
+      - name: Fix Missing App Icons
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path("app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          s = re.sub(r'\s+android:icon="[^"]*"', '', s)
+          s = re.sub(r'\s+android:roundIcon="[^"]*"', '', s)
+          p.write_text(s)
+          print("Missing icon references removed.")
+          PY
 
       - name: Build APK
         run: gradle --no-daemon assembleDebug
